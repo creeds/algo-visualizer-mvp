@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <!-- ... (CSS 與原本相同) ... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyScript 演算法架構版</title>
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-    
-    <!-- 設定檔：告訴 PyScript 需要去讀取哪些本地端的 .py 檔案 -->
+    <style>
+        /* 剛才的 CSS 照舊 */
+        body { font-family: sans-serif; padding: 20px; }
+        .bar-container { display: flex; align-items: flex-end; height: 200px; gap: 8px; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+        .bar { width: 40px; background-color: #3498db; text-align: center; color: white; transition: height 0.3s; }
+        #log { margin-top: 20px; background: #333; color: #fff; padding: 10px; height: 150px; overflow-y: auto; font-family: monospace; }
+    </style>
     <py-config>
         [[fetch]]
         files = ["./algorithm.py", "./main.py"]
@@ -14,8 +21,10 @@
 <body>
     <div id="visualizer" class="bar-container"></div>
     <button id="sort-btn">開始排序</button>
+    
+    <!-- 新增用來顯示 Debug 訊息的區塊 -->
+    <div id="log">等待執行...</div>
 
-    <!-- 執行控制器 -->
     <script type="py" src="./main.py"></script>
 </body>
 </html>
