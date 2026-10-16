@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyScript 演算法展示 MVP</title>
+    <!-- 引入最新版 PyScript 的 CSS 與 JS -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; background-color: #f9f9f9; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .bar-container { display: flex; align-items: flex-end; height: 200px; gap: 8px; margin-top: 20px; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+        .bar { width: 40px; background-color: #3498db; text-align: center; color: white; font-size: 14px; font-weight: bold; border-radius: 4px 4px 0 0; transition: height 0.3s ease, background-color 0.3s ease; }
+        button { padding: 12px 24px; font-size: 16px; margin-top: 20px; cursor: pointer; background-color: #2ecc71; color: white; border: none; border-radius: 8px; font-weight: bold; width: 100%; }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        #log { margin-top: 20px; background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 14px; white-space: pre-wrap; height: 100px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>📊 氣泡排序 (Python 底層運算)</h2>
+        <p>這是一個純 HTML 網頁，排序演算法是透過 PyScript 在你手機的瀏覽器端用 <b>Python</b> 原生執行的。</p>
+
+        <!-- 這裡是長條圖的容器 -->
+        <div class="bar-container" id="visualizer"></div>
+
+        <!-- 觸發 Python 函數的按鈕 -->
+        <button id="sort-btn">開始排序 (執行 Python)</button>
+
+        <!-- 顯示 Python 輸出的 Log -->
+        <div id="log">等待執行...</div>
+    </div>
+
+    <!-- 這裡開始是純 Python 程式碼！ -->
+    <script type="py">
+        import asyncio
+        from pyscript import document
+
+        # 初始測資
+        data = [80, 40, 120, 60, 160, 20, 100]
+
+        # 負責更新畫面的 Python 函數
+        def render_bars(arr, active_indices=[]):
+            container = document.querySelector("#visualizer")
+            container.innerHTML = ""
+            for i, val in enumerate(arr):
+                div = document.createElement("div")
+                div.className = "bar"
+                div.style.height = f"{val}px"
+                div.innerText = str(val)
+                # 如果是正在比較的兩個數字，換個顏色
+                if i in active_indices:
+                    div.style.backgroundColor = "#e74c3c"
+                container.appendChild(div)
+
+        # 網頁載入時先畫出初始狀態
+        render_bars(data)
+
+        # 氣泡排序核心邏輯 (加上 async 是為了可以用 asyncio.sleep 暫停做動畫)
+        async def bubble_sort(event):
+            log_div = document.querySelector("#log")
+            btn = document.querySelector("#sort-btn")
+            btn.disabled = True
+            
+            arr = data.copy()
+            n = len(arr)
+            
+            log_div.innerText = "Python 開始執行氣泡排序...\n"
+            
+            for i in range(n):
+                for j in range(0, n-i-1):
+                    # 呈現目前正在比較的元素
+                    render_bars(arr, [j, j+1])
+                    log_div.innerText = f"比較 {arr[j]} 與 {arr[j+1]}...\n"
+                    await asyncio.sleep(0.5) # 暫停 0.5 秒讓使用者看清楚
+                    
+                    if arr[j] > arr[j+1]:
+                        # 交換元素
+                        arr[j], arr[j+1] = arr[j+1], arr[j]
+                        render_bars(arr, [j, j+1])
+                        log_div.innerText = f"需要交換！目前狀態: {arr}\n"
+                        await asyncio.sleep(0.5)
+
+            # 完成排序
+            render_bars(arr)
+            log_div.innerText = f"排序完成！最終結果: {arr}"
+            btn.disabled = False
+
+        # 將網頁上的按鈕點擊事件，綁定到 Python 的 bubble_sort 函數
+        document.querySelector("#sort-btn").addEventListener("click", bubble_sort)
+    </script>
+</body>
+</html>
